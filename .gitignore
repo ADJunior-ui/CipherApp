@@ -1,0 +1,8 @@
+# Ignore generated output files
+default.txt
+plot.png
+*.txt
+*.png
+
+# Ignore Python cache folders
+__pycache__/

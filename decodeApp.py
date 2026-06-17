@@ -6,8 +6,10 @@ import numpy as np
 
 
 class CipherApp:
-
+    MIN_ASCII = 32
+    MAX_ASCII = 126
     # everything is here, the apps save room
+
     def __init__(self):
         self.message = ""
         self.key = 0
@@ -17,7 +19,7 @@ class CipherApp:
     # only ENG letter and numbers and so on {sadly no persian}
     def is_valid_text(self, text):
         for ch in text:
-            if ord(ch) < 32 or ord(ch) > 126:
+            if ord(ch) < self.MIN_ASCII or ord(ch) > self.MAX_ASCII:
                 return False
         return True
 
@@ -29,7 +31,7 @@ class CipherApp:
             self.SepSentenc.append((value % 10, value // 10))
     # turn code to x , y for plt libarary
 
-    def decode_message(self):
+    def load_coordinates(self):
         self.message = ""
         for x, y in self.SepSentenc:
             value = y * 10 + x - self.key
@@ -137,7 +139,7 @@ class CipherApp:
         self.save_coordinates(filename)
         print(f"Coordinates saved to {filename}")
         self.print_table()
-        
+
         save_image = input("Save graph as PNG? (y/n): ").lower()
         image_file = None
         if save_image == "y":
@@ -157,7 +159,7 @@ class CipherApp:
 
         self.load_coordinates(filename)
         print("\nDecoded message:")
-        print(self.decode_message())
+        print(self.load_coordinates())
 
 # interface user sees
 

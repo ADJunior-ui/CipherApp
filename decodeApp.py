@@ -11,6 +11,8 @@ Includes utility methods for file I/O and data visualization.
 class CipherApp:
     MIN_ASCII = 32
     MAX_ASCII = 126
+    MIN_PERSIAN = 1536
+    MAX_PERSIAN = 1791
 
 # Initialize application state: message text, shift key, and coordinate data
 
@@ -20,9 +22,14 @@ class CipherApp:
         self.SepSentenc = []
 
     def is_valid_text(self, text):
-        """Check if input text contains only printable ASCII characters."""
+        """Check if input text contains only valid English ASCII or Persian Unicode characters."""
         for ch in text:
-            if ord(ch) < self.MIN_ASCII or ord(ch) > self.MAX_ASCII:
+            val = ord(ch)
+            # Check if the character falls outside both the standard English and Persian blocks
+            is_english = self.MIN_ASCII <= val <= self.MAX_ASCII
+            is_persian = self.MIN_PERSIAN <= val <= self.MAX_PERSIAN
+
+            if not (is_english or is_persian):
                 return False
         return True
 
@@ -131,6 +138,7 @@ class CipherApp:
         plt.show()
 
 # Presentation Layer: Standalone CLI flow functions decoupled from the core data processing class
+
 
 def run_encode_flow(app):
     """Execute the complete interactive terminal flow for encoding a user message."""

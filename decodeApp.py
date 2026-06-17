@@ -2,34 +2,36 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
-# the main class{core}
-
+# Core application class handling cipher logic, file operations, and graphing
 
 class CipherApp:
     MIN_ASCII = 32
     MAX_ASCII = 126
-    # everything is here, the apps save room
+
+# Initialize application state: message text, shift key, and coordinate data
 
     def __init__(self):
         self.message = ""
         self.key = 0
         self.SepSentenc = []
 
-    # BEM nameing toturiak used
-    # only ENG letter and numbers and so on {sadly no persian}
-    def is_valid_text(self, text):
+# Validate input text to ensure all characters fall within the printable ASCII range    def is_valid_text(self, text):
+
         for ch in text:
             if ord(ch) < self.MIN_ASCII or ord(ch) > self.MAX_ASCII:
                 return False
         return True
 
     def encode_message(self):
-        # Extracted ASCII plus the secert key for the opereation
+
+# Convert characters to X,Y coordinates using the ASCII value shifted by the key
+
         self.SepSentenc = []
         for ch in self.message:
             value = ord(ch) + self.key
             self.SepSentenc.append((value % 10, value // 10))
-    # turn code to x , y for plt libarary
+
+# Reconstruct the text message from coordinate sets using the reverse shift key
 
     def load_coordinates(self):
         self.message = ""
@@ -37,15 +39,15 @@ class CipherApp:
             value = y * 10 + x - self.key
             self.message += chr(value)
         return self.message
-    # create file to save the code
-    # stackflow bookmarked
+
+# Export the generated coordinate pairs into a plain text file
 
     def save_coordinates(self, filename):
         with open(filename, "w") as file:
             for x, y in self.SepSentenc:
                 file.write(f"{x} {y}\n")
-    #  load the created file
-    #  youtube playlist
+
+# Import coordinate pairs from an existing text file
 
     def load_coordinates(self, filename):
         self.SepSentenc = []
@@ -54,8 +56,8 @@ class CipherApp:
                 parts = line.strip().split()
                 if len(parts) == 2:
                     self.SepSentenc.append((int(parts[0]), int(parts[1])))
-    # preview the letter codes table
-    # github repo for video Ciphering
+
+# Render a formatted text table mapping characters to their coordinates
 
     def print_table(self):
         print("\nCharacter ASCII Table")
@@ -68,7 +70,8 @@ class CipherApp:
             if ch == " ":
                 ch = "' '"
             print(f"{ch:<6}{ord(self.message[i]):<8}{x:<4}{y}")
-    #  plt library document
+
+# Generate and visualize the sequential path of coordinates using matplotlib
 
     def draw_plot(self, image_name=None):
         if not self.SepSentenc:
@@ -77,7 +80,6 @@ class CipherApp:
 
         x_values = [p[0] for p in self.SepSentenc]
         y_values = [p[1] for p in self.SepSentenc]
-#  claud
         plt.figure(figsize=(9, 7))
         colors = cm.plasma(np.linspace(0, 1, max(len(self.SepSentenc) - 1, 1)))
 
@@ -115,7 +117,8 @@ class CipherApp:
             print(f"Saved image as {image_name}")
 
         plt.show()
-# UI for app plus the condition
+
+# Handle the user interactive input flow for the encoding sequence
 
     def run_encode_flow(self):
         self.message = input("Enter message: ")
@@ -127,11 +130,15 @@ class CipherApp:
         key_text = input("Key: ").strip()
         try:
             self.key = int(key_text)
-            # deafult key
+
+# Fallback to a default key value of 0 if parsing fails
+
         except ValueError:
             self.key = 0
         self.encode_message()
-        # file nameing
+
+# Prompt user for output location or fall back to default filename
+
         filename = input("Output file [default.txt]: ").strip()
         if filename == "":
             filename = "default.txt"
@@ -161,8 +168,7 @@ class CipherApp:
         print("\nDecoded message:")
         print(self.load_coordinates())
 
-# interface user sees
-
+# Main application runtime loop and command menu execution
 
 def main():
     app = CipherApp()

@@ -12,34 +12,39 @@ An elegant, dark-mode cryptography dashboard that bridges an advanced Python cip
 
 ---
 
-## 🏃‍♂️ How to Run This Project (Beginner-Friendly Guide)
+## 🏃‍♂️ How to Run This Project (Windows Guide)
 
-You do not need to be a programmer to get this application running on your computer. Just follow these simple steps:
+Follow these simple steps to get the application running on your Windows computer:
 
-### Step 1: Install Python on Your Computer
-This app runs on Python. If you don't have it yet:
-1. Go to [python.org/downloads](https://www.python.org/downloads/) and download the latest version for your computer (Windows or Mac).
-2. Run the installer program you just downloaded.
-3. **CRITICAL STEP:** On the very first screen of the installer, look at the bottom and check the box that says **"Add Python to PATH"**. If you skip this, your computer won't understand Python commands.
-4. Finish clicking through the installer setup.
+### Step 1: Install Python
+1. Download the latest version of Python for Windows from [python.org/downloads](https://www.python.org/downloads/).
+2. Run the downloaded installer.
+3. **IMPORTANT:** Check the box at the very bottom that says **"Add Python to PATH"** before clicking install. 
 
-### Step 2: Download the Project Files
-1. Look at the top right of this GitHub page and click the green **Code** button.
-2. Click **Download ZIP** from the dropdown menu.
-3. Once downloaded, extract/unzip the file anywhere on your computer (like your Desktop).
+### Step 2: Download the Project
+1. Click the green **Code** button at the top right of this GitHub page.
+2. Click **Download ZIP**.
+3. Extract/unzip the downloaded file onto your Desktop.
 
-### Step 3: Open Your Command Terminal
-Your computer has a built-in window for running commands:
-- **Windows:** Click your Start Menu, search for **cmd** (Command Prompt), and open it.
-- **Mac:** Press `Cmd + Space` to open Spotlight search, type **Terminal**, and open it.
+### Step 3: Open Command Prompt
+1. Open your Windows Start Menu.
+2. Search for **cmd** (Command Prompt) and open it.
 
-### Step 4: Navigate to the Extracted Folder
-You need to tell the terminal to look inside your project folder:
+### Step 4: Navigate to the Folder
 1. Type `cd ` (type cd followed by a single space, do not press enter yet).
-2. Find the folder you unzipped in Step 2, click it, and drag-and-drop that folder directly into your terminal window. The terminal will automatically fill in the folder's path location.
+2. Drag and drop your unzipped project folder directly from your desktop into the Command Prompt window.
 3. Press **Enter**.
 
-### Step 5: Install the App's Required Tools
-Copy and paste this exact command into your terminal and press **Enter**:
+### Step 5: Install Requirements
+Copy and paste this command into the window and press **Enter**:
 ```bash
 pip install -r requirements.txt
+
+### Step 6: Launch the App
+Copy and paste this final command and press **Enter**:
+```bash
+python app.py
+
+### Step 7: Open in Browser
+Open your web browser and go to this address:
+http://127.0.0.1:5000

@@ -62,11 +62,17 @@ class CipherApp:
     def load_coordinates(self, filename):
         """Import coordinate pairs from an external text file into the application state."""
         self.SepSentenc = []
-        with open(filename, "r") as file:
-            for line in file:
-                parts = line.strip().split()
-                if len(parts) == 2:
-                    self.SepSentenc.append((int(parts[0]), int(parts[1])))
+        try :
+            with open(filename, "r") as file:
+                for line in file:
+                    parts = line.strip().split()
+                    if len(parts) == 2:
+                        try :
+                            self.SepSentenc.append((int(parts[0]), int(parts[1])))
+                        except ValueError:
+                            print("[!] Error: Skipping corrupted coordinate row.")
+        except FileNotFoundError:
+            print("[!] Error: File not found. Please check the path and try again.")
 
 # Render a formatted text table mapping characters to their coordinates
 
@@ -134,11 +140,12 @@ class CipherApp:
 
     def run_encode_flow(self):
         """Execute the complete interactive terminal flow for encoding a user message."""
-        self.message = input("Enter message: ")
-
-        if not self.is_valid_text(self.message):
-            print("No ASCII characters was entered.")
-            return
+# this loop forces valid ASCII input before allowing the sequence to proceed.
+        while True:
+            self.message = input("Enter message: ")
+            if self.is_valid_text(self.message):
+                break
+            print("[!] Invalid characters detected. Please use standard characters.")
 
         key_text = input("Key: ").strip()
         try:

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CipherApp Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col">
 
     <header class="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex justify-between items-center">
@@ -20,23 +22,32 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+
         <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col justify-between">
             <div>
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-4">⚡ Mode Selection</h2>
                 <div class="grid grid-cols-2 gap-2 mb-6 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-                    <button id="encodeTab" class="py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm">Encode Mode</button>
-                    <button id="decodeTab" class="py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200">Decode Mode</button>
+                    <button id="encodeTab"
+                        class="py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm">Encode
+                        Mode</button>
+                    <button id="decodeTab"
+                        class="py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200">Decode
+                        Mode</button>
                 </div>
 
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">📝 Input Data</h2>
-                <textarea id="inputText" class="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 placeholder-zinc-600 resize-none mb-4" placeholder="Enter English/Persian text here..."></textarea>
+                <textarea id="inputText"
+                    class="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 placeholder-zinc-600 resize-none mb-4"
+                    placeholder="Enter English/Persian text here..."></textarea>
 
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">🔑 Secret Shift Key</h2>
-                <input type="number" id="inputKey" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 mb-4" value="0">
+                <input type="number" id="inputKey"
+                    class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 mb-4"
+                    value="0">
             </div>
 
-            <button id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 transition-colors text-white font-medium py-3 rounded-lg shadow-lg">
+            <button id="submitBtn"
+                class="w-full bg-indigo-600 hover:bg-indigo-500 transition-colors text-white font-medium py-3 rounded-lg shadow-lg">
                 Execute Encryption Sequence
             </button>
         </section>
@@ -44,14 +55,17 @@
         <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col space-y-6">
             <div>
                 <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📊 Output Preview</h2>
-                <div id="outputPreview" class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto">
+                <div id="outputPreview"
+                    class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto">
                     System idle. Awaiting user execution sequence...
                 </div>
             </div>
 
             <div class="flex-1 flex flex-col">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📈 Vector Coordinate Path</h2>
-                <div id="graphContainer" class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center p-4 text-sm text-zinc-500 font-mono min-h-[250px]">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📈 Vector Coordinate
+                    Path</h2>
+                <div id="graphContainer"
+                    class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center p-4 text-sm text-zinc-500 font-mono min-h-[250px]">
                     No vector graph rendered yet.
                 </div>
             </div>
@@ -67,16 +81,14 @@
         const submitBtn = document.getElementById('submitBtn');
         const outputPreview = document.getElementById('outputPreview');
         const graphContainer = document.getElementById('graphContainer');
-        
+
         let currentMode = 'encode';
 
         function setMode(mode) {
             currentMode = mode;
             inputText.value = '';
-            outputPreview.innerText = "System idle. Awaiting user execution sequence...";
-            outputPreview.className = "bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto";
-            graphContainer.innerHTML = `<span class="text-zinc-600 font-mono text-xs">No vector graph rendered yet.</span>`;
-            
+            resetDisplay();
+
             if (mode === 'encode') {
                 encodeTab.className = "py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm";
                 decodeTab.className = "py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200";
@@ -90,12 +102,20 @@
             }
         }
 
+        function resetDisplay() {
+            outputPreview.innerText = "System idle. Awaiting user execution sequence...";
+            outputPreview.className = "bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto";
+            graphContainer.innerHTML = `<span class="text-zinc-600 font-mono text-xs">No vector graph rendered yet.</span>`;
+        }
+
         encodeTab.addEventListener('click', () => setMode('encode'));
         decodeTab.addEventListener('click', () => setMode('decode'));
 
         async function runPipeline() {
-            if(!inputText.value.strip) {
-                if(inputText.value.trim() === "") return;
+            // Fix: Clean validation check. If input field is empty, instantly reset the screen layout
+            if (inputText.value.trim() === "") {
+                resetDisplay();
+                return;
             }
 
             const payload = {
@@ -116,7 +136,7 @@
                 if (data.success) {
                     outputPreview.innerText = data.result;
                     outputPreview.className = "bg-zinc-950 border border-indigo-900 rounded-lg p-4 h-24 font-mono text-sm text-indigo-400 overflow-y-auto";
-                    
+
                     if (data.graph) {
                         graphContainer.innerHTML = `<img src="data:image/png;base64,${data.graph}" class="max-h-[280px] w-auto mx-auto object-contain rounded-lg" alt="Vector Path Graph">`;
                     }
@@ -137,4 +157,5 @@
         inputKey.addEventListener('input', runPipeline);
     </script>
 </body>
+
 </html>

@@ -36,7 +36,7 @@ Follow these simple steps to get the application running on your Windows compute
 3. Press **Enter**.
 
 ### Step 5: Install Requirements
-Copy and paste this command into the window and press **Enter**:
+Copy and paste this command into the window and press **Enter**
 ```bash
 pip install -r requirements.txt.
 

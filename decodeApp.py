@@ -181,7 +181,10 @@ def run_encode_flow(app):
 
 def run_decode_flow(app):
     """Execute the complete interactive terminal flow for decoding a coordinate file."""
-    filename = input("Coordinate file: ").strip()
+# Prompt user for input coordinate file or fall back to default filename
+    filename = input("Coordinate file [default.txt]: ").strip()
+    if filename == "":
+        filename = "default.txt"
     key_text = input("Key (press Enter for 0): ").strip()
     try:
         app.key = int(key_text)

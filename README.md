@@ -38,12 +38,12 @@ Follow these simple steps to get the application running on your Windows compute
 ### Step 5: Install Requirements
 Copy and paste this command into the window and press **Enter**:
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt.
 
 ### Step 6: Launch the App
 Copy and paste this final command and press **Enter**:
 ```bash
-python app.py
+python app.py.
 
 ### Step 7: Open in Browser
 Open your web browser and go to this address:

@@ -7,6 +7,7 @@ A class to handle text encryption and decryption using ASCII coordinate mapping.
 Includes utility methods for file I/O and data visualization.
 """
 
+
 class CipherApp:
     MIN_ASCII = 32
     MAX_ASCII = 126
@@ -31,18 +32,10 @@ class CipherApp:
         for ch in self.message:
             value = ord(ch) + self.key
             self.SepSentenc.append((value % 10, value // 10))
-  
-    def decode_message(self):
-        """Reconstruct the original text message from the coordinate pairs using the reverse shift key."""
-        self.message = ""
-        for x, y in self.SepSentenc:
-            value = y * 10 + x - self.key
-            self.message += chr(value)
-        return self.message
 
 # Reconstruct the text message from coordinate sets using the reverse shift key
-
-    def load_coordinates(self):
+    def decode_message(self):
+        """Reconstruct the original text message from the coordinate pairs using the reverse shift key."""
         self.message = ""
         for x, y in self.SepSentenc:
             value = y * 10 + x - self.key
@@ -62,13 +55,14 @@ class CipherApp:
     def load_coordinates(self, filename):
         """Import coordinate pairs from an external text file into the application state."""
         self.SepSentenc = []
-        try :
+        try:
             with open(filename, "r") as file:
                 for line in file:
                     parts = line.strip().split()
                     if len(parts) == 2:
-                        try :
-                            self.SepSentenc.append((int(parts[0]), int(parts[1])))
+                        try:
+                            self.SepSentenc.append(
+                                (int(parts[0]), int(parts[1])))
                         except ValueError:
                             print("[!] Error: Skipping corrupted coordinate row.")
         except FileNotFoundError:
@@ -125,71 +119,76 @@ class CipherApp:
                 xytext=(5, 5)
             )
 
-        plt.title("Encoded Path")
-        plt.xlabel("X coordinate")
-        plt.ylabel("Y coordinate")
-        plt.grid(True)
 
-        if image_name:
-            plt.savefig(image_name, dpi=150)
-            print(f"Saved image as {image_name}")
+def load_coordinates(self):
+    plt.title("Encoded Path")
+    plt.xlabel("X coordinate")
+    plt.ylabel("Y coordinate")
+    plt.grid(True)
 
-        plt.show()
+    if image_name:
+        plt.savefig(image_name, dpi=150)
+        print(f"Saved image as {image_name}")
 
-# Handle the user interactive input flow for the encoding sequence
+    plt.show()
 
-    def run_encode_flow(self):
-        """Execute the complete interactive terminal flow for encoding a user message."""
+# Presentation Layer: Standalone CLI flow functions decoupled from the core data processing class
+
+
+def run_encode_flow(app):
+    """Execute the complete interactive terminal flow for encoding a user message."""
 # this loop forces valid ASCII input before allowing the sequence to proceed.
-        while True:
-            self.message = input("Enter message: ")
-            if self.is_valid_text(self.message):
-                break
-            print("[!] Invalid characters detected. Please use standard characters.")
+    while True:
+        app.message = input("Enter message: ")
+        if app.is_valid_text(app.message):
+            break
+        print("[!] Invalid characters detected. Please use standard characters.")
 
-        key_text = input("Key: ").strip()
-        try:
-            self.key = int(key_text)
+    key_text = input("Key: ").strip()
+    try:
+        app.key = int(key_text)
 
 # Fallback to a default key value of 0 if parsing fails
 
-        except ValueError:
-            self.key = 0
-        self.encode_message()
+    except ValueError:
+        app.key = 0
+    app.encode_message()
 
 # Prompt user for output location or fall back to default filename
 
-        filename = input("Output file [default.txt]: ").strip()
-        if filename == "":
-            filename = "default.txt"
+    filename = input("Output file [default.txt]: ").strip()
+    if filename == "":
+        filename = "default.txt"
 
-        self.save_coordinates(filename)
-        print(f"Coordinates saved to {filename}")
-        self.print_table()
+    app.save_coordinates(filename)
+    print(f"Coordinates saved to {filename}")
+    app.print_table()
 
-        save_image = input("Save graph as PNG? (y/n): ").lower()
-        image_file = None
-        if save_image == "y":
-            image_file = input("Image filename [plot.png]: ").strip()
-            if image_file == "":
-                image_file = "plot.png"
+    save_image = input("Save graph as PNG? (y/n): ").lower()
+    image_file = None
+    if save_image == "y":
+        image_file = input("Image filename [plot.png]: ").strip()
+        if image_file == "":
+            image_file = "plot.png"
 
-        self.draw_plot(image_file)
+    app.draw_plot(image_file)
 
-    def run_decode_flow(self):
-        """Execute the complete interactive terminal flow for decoding a coordinate file."""
-        filename = input("Coordinate file: ").strip()
-        key_text = input("Key (press Enter for 0): ").strip()
-        try:
-            self.key = int(key_text)
-        except ValueError:
-            self.key = 0
 
-        self.load_coordinates(filename)
-        print("\nDecoded message:")
-        print(self.load_coordinates())
+def run_decode_flow(app):
+    """Execute the complete interactive terminal flow for decoding a coordinate file."""
+    filename = input("Coordinate file: ").strip()
+    key_text = input("Key (press Enter for 0): ").strip()
+    try:
+        app.key = int(key_text)
+    except ValueError:
+        app.key = 0
+
+    app.load_coordinates(filename)
+    print("\nDecoded message:")
+    print(app.decode_message())
 
 # Main application runtime loop and command menu execution
+
 
 def main():
     app = CipherApp()
@@ -202,10 +201,10 @@ def main():
         choice = input("Select option: ")
 
         if choice == "1":
-            app.run_encode_flow()
+            run_encode_flow(app)
 
         elif choice == "2":
-            app.run_decode_flow()
+            run_decode_flow(app)
 
         elif choice == "3":
             print("Goodbye.")

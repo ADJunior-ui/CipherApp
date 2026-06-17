@@ -35,16 +35,15 @@ Follow these simple steps to get the application running on your Windows compute
 2. Drag and drop your unzipped project folder directly from your desktop into the Command Prompt window.
 3. Press **Enter**.
 
-### Step 5: Install Requirements
-Copy and paste this command into the window and press **Enter**
+### Step 5: Install Requirements and run
+Copy and paste this command into the window and press **Enter**:
 ```bash
-pip install -r requirements.txt.
+1. pip install -r requirements.txt.
 
-### Step 6: Launch the App
-Copy and paste this final command and press **Enter**:
+2. Copy and paste this final command and press **Enter**:
 ```bash
 python app.py.
 
-### Step 7: Open in Browser
-Open your web browser and go to this address:
+
+3. Open your web browser and go to this address:
 http://127.0.0.1:5000

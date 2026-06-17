@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
 
-# Core application class handling cipher logic, file operations, and graphing
+"""
+A class to handle text encryption and decryption using ASCII coordinate mapping.
+Includes utility methods for file I/O and data visualization.
+"""
 
 class CipherApp:
     MIN_ASCII = 32
@@ -15,21 +18,27 @@ class CipherApp:
         self.key = 0
         self.SepSentenc = []
 
-# Validate input text to ensure all characters fall within the printable ASCII range    def is_valid_text(self, text):
-
+    def is_valid_text(self, text):
+        """Check if input text contains only printable ASCII characters."""
         for ch in text:
             if ord(ch) < self.MIN_ASCII or ord(ch) > self.MAX_ASCII:
                 return False
         return True
 
     def encode_message(self):
-
-# Convert characters to X,Y coordinates using the ASCII value shifted by the key
-
+        """Convert the text message into sequential X,Y coordinate pairs using the shift key."""
         self.SepSentenc = []
         for ch in self.message:
             value = ord(ch) + self.key
             self.SepSentenc.append((value % 10, value // 10))
+  
+    def decode_message(self):
+        """Reconstruct the original text message from the coordinate pairs using the reverse shift key."""
+        self.message = ""
+        for x, y in self.SepSentenc:
+            value = y * 10 + x - self.key
+            self.message += chr(value)
+        return self.message
 
 # Reconstruct the text message from coordinate sets using the reverse shift key
 
@@ -43,6 +52,7 @@ class CipherApp:
 # Export the generated coordinate pairs into a plain text file
 
     def save_coordinates(self, filename):
+        """Export the current session's coordinates into a plain text file."""
         with open(filename, "w") as file:
             for x, y in self.SepSentenc:
                 file.write(f"{x} {y}\n")
@@ -50,6 +60,7 @@ class CipherApp:
 # Import coordinate pairs from an existing text file
 
     def load_coordinates(self, filename):
+        """Import coordinate pairs from an external text file into the application state."""
         self.SepSentenc = []
         with open(filename, "r") as file:
             for line in file:
@@ -74,6 +85,7 @@ class CipherApp:
 # Generate and visualize the sequential path of coordinates using matplotlib
 
     def draw_plot(self, image_name=None):
+        """Generate and render a sequential vector path of the coordinates using matplotlib."""
         if not self.SepSentenc:
             print("Nothing to plot.")
             return
@@ -121,6 +133,7 @@ class CipherApp:
 # Handle the user interactive input flow for the encoding sequence
 
     def run_encode_flow(self):
+        """Execute the complete interactive terminal flow for encoding a user message."""
         self.message = input("Enter message: ")
 
         if not self.is_valid_text(self.message):
@@ -157,6 +170,7 @@ class CipherApp:
         self.draw_plot(image_file)
 
     def run_decode_flow(self):
+        """Execute the complete interactive terminal flow for decoding a coordinate file."""
         filename = input("Coordinate file: ").strip()
         key_text = input("Key (press Enter for 0): ").strip()
         try:

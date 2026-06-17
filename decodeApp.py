@@ -118,22 +118,19 @@ class CipherApp:
                 textcoords="offset points",
                 xytext=(5, 5)
             )
+# Configure plot layout settings and render the final figure
+        plt.title("Encoded Path")
+        plt.xlabel("X coordinate")
+        plt.ylabel("Y coordinate")
+        plt.grid(True)
 
+        if image_name:
+            plt.savefig(image_name, dpi=150)
+            print(f"Saved image as {image_name}")
 
-def load_coordinates(self):
-    plt.title("Encoded Path")
-    plt.xlabel("X coordinate")
-    plt.ylabel("Y coordinate")
-    plt.grid(True)
-
-    if image_name:
-        plt.savefig(image_name, dpi=150)
-        print(f"Saved image as {image_name}")
-
-    plt.show()
+        plt.show()
 
 # Presentation Layer: Standalone CLI flow functions decoupled from the core data processing class
-
 
 def run_encode_flow(app):
     """Execute the complete interactive terminal flow for encoding a user message."""

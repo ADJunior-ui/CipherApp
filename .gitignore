@@ -1,8 +1,15 @@
-# Ignore generated output files
+# Ignore specific generated output files
 default.txt
 plot.png
-*.txt
-*.png
 
 # Ignore Python cache folders
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local system and code editor clutter
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

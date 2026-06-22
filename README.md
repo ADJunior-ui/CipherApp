@@ -1,73 +1,69 @@
 # CipherApp Studio 🔒
 
-An elegant, dark-mode cryptography dashboard that bridges a Python cipher engine with a small web UI. The app encodes text into coordinate pairs and decodes coordinate streams back to text, with support for English and Persian scripts.
+A simple Flask project that lets you turn text into coordinate pairs and turn those pairs back into text.
 
-## Key Features
+## What it does
 
-- Bidirectional encode/decode between text and X,Y coordinates
-- Multilingual: English and Persian script handling
-- Live vector path visualization (Matplotlib)
-- Simple local persistence to `default.txt`
+- Encode text into coordinate values
+- Decode coordinate values back into text
+- Show a small graph of the points
+- Save the latest result to `default.txt`
 
----
+## How to run
 
-## Prerequisites
-
-- Python 3.10 or newer
-- Git (optional, for cloning)
-
-## Quick start (Windows)
-
-Open PowerShell or Command Prompt and run the following commands from the project root.
-
-1) (Optional) Create and activate a virtual environment:
+1. Install Python 3.10+
+2. Open the project folder in a terminal
+3. Create a virtual environment
 
 ```powershell
 python -m venv venv
-venv\Scripts\Activate.ps1   # PowerShell
-# or: venv\Scripts\activate  # cmd.exe
+venv\Scripts\Activate.ps1
 ```
 
-2) Install dependencies:
+4. Install the needed packages
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-3) Run the application (development):
+5. Start the app
 
 ```powershell
 python app.py
 ```
 
-4) Open your browser at:
+6. Open this in your browser:
 
+```text
 http://127.0.0.1:5000
+```
 
-Notes
-- The server runs with Flask's built-in development server. Do not use `debug=True` in production.
-- For production deployments, run the app behind a WSGI server (e.g. `gunicorn`) or a Windows-compatible host.
+## How to use
 
-## Usage
+- Use **Encode** mode to turn text into coordinates.
+- Use **Decode** mode to enter coordinates like `5,3 2,7`.
 
-- Encode text: switch to "Encode" mode in the UI, enter text and an optional numeric key, then execute.
-- Decode coordinates: switch to "Decode" mode and provide coordinates in the format `X,Y X,Y`.
+## Testing
 
-## Project layout
+Run the full test suite with:
 
-- `app.py` — Flask web server and API
-- `decodeApp.py` — `CipherApp` implementation (encoding/decoding, CLI helpers)
-- `templates/index.html` — web UI
-- `requirements.txt` — Python dependencies
+```powershell
+python -m unittest discover -s tests -v
+```
 
-## Contributing & License
+The test suite covers:
+- Cipher logic (encoding, decoding, validation)
+- Flask routes and error handling
+- Edge cases and input validation
 
-- If you want contributors, add a `CONTRIBUTING.md` and a `LICENSE` file.
+## File overview
 
-## Recommended improvements
+- `app.py` — Flask web app and request handling
+- `decodeApp.py` — simple cipher logic
+- `templates/index.html` — the UI
+- `requirements.txt` — package list
+- `tests/` — unit tests for the app
 
-- Add a small `.env` or config loader for configurable output paths and debug toggles.
-- Add unit tests for `CipherApp.encode_message()` and `decode_message()` and a CI workflow.
-- Consider documenting the exact cipher mapping used (how characters map to coordinate pairs) for clarity.
+## Note
 
-If you want, I can apply these improvements directly (README tweaks are done). If you'd like I can also add a `LICENSE` or example `.env` next.
+This is a fun learning project, not a real secure encryption tool.

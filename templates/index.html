@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CipherApp Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col">
-
     <header class="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-2">
             <span class="text-xl">🔒</span>
@@ -22,55 +19,35 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col justify-between">
             <div>
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-4">⚡ Mode Selection</h2>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-4">⚡ Mode</h2>
                 <div class="grid grid-cols-2 gap-2 mb-6 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-                    <button id="encodeTab"
-                        class="py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm">Encode
-                        Mode</button>
-                    <button id="decodeTab"
-                        class="py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200">Decode
-                        Mode</button>
+                    <button id="encodeTab" class="py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm">Encode</button>
+                    <button id="decodeTab" class="py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200">Decode</button>
                 </div>
 
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">📝 Input Data</h2>
-                <textarea id="inputText"
-                    class="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 placeholder-zinc-600 resize-none mb-4"
-                    placeholder="Enter English/Persian text here..."></textarea>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">📝 Text / Coordinates</h2>
+                <textarea id="inputText" class="w-full h-32 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 placeholder-zinc-600 resize-none mb-4" placeholder="Enter English/Persian text here..."></textarea>
 
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">🔑 Secret Shift Key</h2>
-                <input type="number" id="inputKey"
-                    class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 mb-4"
-                    value="0">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-2">🔑 Key</h2>
+                <input type="number" id="inputKey" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500 mb-4" value="0">
             </div>
 
-            <button id="submitBtn"
-                class="w-full bg-indigo-600 hover:bg-indigo-500 transition-colors text-white font-medium py-3 rounded-lg shadow-lg">
-                Execute Encryption Sequence
-            </button>
+            <button id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 transition-colors text-white font-medium py-3 rounded-lg shadow-lg">Run</button>
         </section>
 
         <section class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col space-y-6">
             <div>
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📊 Output Preview</h2>
-                <div id="outputPreview"
-                    class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto">
-                    System idle. Awaiting user execution sequence...
-                </div>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📊 Result</h2>
+                <div id="outputPreview" class="bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto">Waiting for input...</div>
             </div>
 
             <div class="flex-1 flex flex-col">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📈 Vector Coordinate
-                    Path</h2>
-                <div id="graphContainer"
-                    class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center p-4 text-sm text-zinc-500 font-mono min-h-[250px]">
-                    No vector graph rendered yet.
-                </div>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-indigo-400 mb-3">📈 Graph</h2>
+                <div id="graphContainer" class="flex-1 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center p-4 text-sm text-zinc-500 font-mono min-h-[250px]">No graph yet.</div>
             </div>
         </section>
-
     </main>
 
     <script>
@@ -90,30 +67,40 @@
             resetDisplay();
 
             if (mode === 'encode') {
-                encodeTab.className = "py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm";
-                decodeTab.className = "py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200";
-                inputText.placeholder = "Enter English/Persian text here...";
-                submitBtn.innerText = "Execute Encryption Sequence";
+                encodeTab.className = 'py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm';
+                decodeTab.className = 'py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200';
+                inputText.placeholder = 'Enter English/Persian text here...';
+                submitBtn.innerText = 'Run';
             } else {
-                decodeTab.className = "py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm";
-                encodeTab.className = "py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200";
-                inputText.placeholder = "Enter coordinate sequence data (e.g., 5,3 2,7)...";
-                submitBtn.innerText = "Execute Decryption Sequence";
+                decodeTab.className = 'py-2 text-sm font-medium rounded-md bg-indigo-600 text-white shadow-sm';
+                encodeTab.className = 'py-2 text-sm font-medium rounded-md text-zinc-400 hover:text-zinc-200';
+                inputText.placeholder = 'Enter coordinate pairs like 5,3 2,7';
+                submitBtn.innerText = 'Run';
             }
         }
 
         function resetDisplay() {
-            outputPreview.innerText = "System idle. Awaiting user execution sequence...";
-            outputPreview.className = "bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto";
-            graphContainer.innerHTML = `<span class="text-zinc-600 font-mono text-xs">No vector graph rendered yet.</span>`;
+            outputPreview.innerText = 'Waiting for input...';
+            outputPreview.className = 'bg-zinc-950 border border-zinc-800 rounded-lg p-4 h-24 font-mono text-sm text-zinc-400 overflow-y-auto';
+            graphContainer.innerHTML = '<span class="text-zinc-600 font-mono text-xs">No graph yet.</span>';
         }
 
-        encodeTab.addEventListener('click', () => setMode('encode'));
-        decodeTab.addEventListener('click', () => setMode('decode'));
+        function showError(message) {
+            outputPreview.innerText = `[!] Error: ${message}`;
+            outputPreview.className = 'bg-zinc-950 border border-red-950 rounded-lg p-4 h-24 font-mono text-sm text-red-400 overflow-y-auto';
+            graphContainer.innerHTML = '<span class="text-red-500 font-mono text-xs">Graph not shown.</span>';
+        }
+
+        function debounce(fn, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
 
         async function runPipeline() {
-            // Fix: Clean validation check. If input field is empty, instantly reset the screen layout
-            if (inputText.value.trim() === "") {
+            if (inputText.value.trim() === '') {
                 resetDisplay();
                 return;
             }
@@ -130,43 +117,29 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
                 const data = await response.json();
 
                 if (data.success) {
                     outputPreview.innerText = data.result;
-                    outputPreview.className = "bg-zinc-950 border border-indigo-900 rounded-lg p-4 h-24 font-mono text-sm text-indigo-400 overflow-y-auto";
-
+                    outputPreview.className = 'bg-zinc-950 border border-indigo-900 rounded-lg p-4 h-24 font-mono text-sm text-indigo-400 overflow-y-auto';
                     if (data.graph) {
-                        graphContainer.innerHTML = `<img src="data:image/png;base64,${data.graph}" class="max-h-[280px] w-auto mx-auto object-contain rounded-lg" alt="Vector Path Graph">`;
+                        graphContainer.innerHTML = `<img src="data:image/png;base64,${data.graph}" class="max-h-[280px] w-auto mx-auto object-contain rounded-lg" alt="Graph">`;
                     }
                 } else {
-                    outputPreview.innerText = `[!] Error: ${data.error}`;
-                    outputPreview.className = "bg-zinc-950 border border-red-950 rounded-lg p-4 h-24 font-mono text-sm text-red-400 overflow-y-auto";
-                    graphContainer.innerHTML = `<span class="text-red-500 font-mono text-xs">Processing failure. Graph hidden.</span>`;
+                    showError(data.error || 'Unknown error.');
                 }
-            } catch (err) {
-                outputPreview.innerText = "[!] Core Engine Network Connection Offline.";
-                outputPreview.className = "bg-zinc-950 border border-red-950 rounded-lg p-4 h-24 font-mono text-sm text-red-400 overflow-y-auto";
+            } catch (error) {
+                showError('Could not connect to the server.');
             }
         }
 
-        // Event triggers
+        encodeTab.addEventListener('click', () => setMode('encode'));
+        decodeTab.addEventListener('click', () => setMode('decode'));
         submitBtn.addEventListener('click', runPipeline);
-        // Debounce helper to avoid firing requests on every keystroke
-        function debounce(fn, wait) {
-            let t = null;
-            return function(...args) {
-                clearTimeout(t);
-                t = setTimeout(() => fn.apply(this, args), wait);
-            };
-        }
 
         const debouncedRun = debounce(runPipeline, 300);
-
         inputText.addEventListener('input', debouncedRun);
         inputKey.addEventListener('input', debouncedRun);
     </script>
 </body>
-
 </html>

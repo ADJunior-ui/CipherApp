@@ -1,235 +1,60 @@
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import numpy as np
-
-"""
-A class to handle text encryption and decryption using ASCII coordinate mapping.
-Includes utility methods for file I/O and data visualization.
-"""
-
-
 class CipherApp:
     MIN_ASCII = 32
     MAX_ASCII = 126
     MIN_PERSIAN = 1536
     MAX_PERSIAN = 1791
 
-# Initialize application state: message text, shift key, and coordinate data
-
     def __init__(self):
-        self.message = ""
+        self.message = ''
         self.key = 0
         self.SepSentenc = []
 
     def is_valid_text(self, text):
-        """Check if input text contains only valid English ASCII or Persian Unicode characters."""
         for ch in text:
-            val = ord(ch)
-            # Check if the character falls outside both the standard English and Persian blocks
-            is_english = self.MIN_ASCII <= val <= self.MAX_ASCII
-            is_persian = self.MIN_PERSIAN <= val <= self.MAX_PERSIAN
-
-            if not (is_english or is_persian):
+            value = ord(ch)
+            if not (
+                self.MIN_ASCII <= value <= self.MAX_ASCII
+                or self.MIN_PERSIAN <= value <= self.MAX_PERSIAN
+            ):
                 return False
         return True
 
     def encode_message(self):
-        """Convert the text message into sequential X,Y coordinate pairs using the shift key."""
+        if not self.message:
+            self.SepSentenc = []
+            return []
+
         self.SepSentenc = []
         for ch in self.message:
             value = ord(ch) + self.key
             self.SepSentenc.append((value % 10, value // 10))
+        return self.SepSentenc
 
-# Reconstruct the text message from coordinate sets using the reverse shift key
     def decode_message(self):
-        """Reconstruct the original text message from the coordinate pairs using the reverse shift key."""
-        self.message = ""
+        decoded = []
+
         for x, y in self.SepSentenc:
             value = y * 10 + x - self.key
-            # Validate value is a valid Unicode code point
-            if value < 0 or value > 0x10FFFF:
-                self.message += '?'
+            if 0 <= value <= 0x10FFFF:
+                decoded.append(chr(value))
             else:
-                try:
-                    self.message += chr(value)
-                except Exception:
-                    self.message += '?'
+                decoded.append('?')
+
+        self.message = ''.join(decoded)
         return self.message
 
-# Export the generated coordinate pairs into a plain text file
+    def set_message(self, text):
+        self.message = text
 
-    def save_coordinates(self, filename):
-        """Export the current session's coordinates into a plain text file."""
-        with open(filename, "w", encoding='utf-8') as file:
-            for x, y in self.SepSentenc:
-                file.write(f"{x} {y}\n")
+    def set_key(self, key):
+        self.key = key
 
-# Import coordinate pairs from an existing text file
+    def set_coordinates(self, coordinates):
+        self.SepSentenc = coordinates
 
-    def load_coordinates(self, filename):
-        """Import coordinate pairs from an external text file into the application state."""
-        self.SepSentenc = []
-        try:
-            with open(filename, "r", encoding='utf-8') as file:
-                for line in file:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    parts = line.replace(',', ' ').split()
-                    if len(parts) == 2:
-                        try:
-                            self.SepSentenc.append((int(parts[0]), int(parts[1])))
-                        except ValueError:
-                            print("[!] Error: Skipping corrupted coordinate row.")
-        except FileNotFoundError:
-            print("[!] Error: File not found. Please check the path and try again.")
+    def to_coordinate_string(self):
+        return ' '.join(f'{x},{y}' for x, y in self.SepSentenc)
 
-# Render a formatted text table mapping characters to their coordinates
+    def to_coordinate_list(self):
+        return list(self.SepSentenc)
 
-    def print_table(self):
-        print("\nCharacter ASCII Table")
-        print("-" * 30)
-        print(f"{'Char':<6}{'ASCII':<8}{'X':<4}{'Y'}")
-
-        for i in range(len(self.message)):
-            ch = self.message[i]
-            x, y = self.SepSentenc[i]
-            if ch == " ":
-                ch = "' '"
-            print(f"{ch:<6}{ord(self.message[i]):<8}{x:<4}{y}")
-
-# Generate and visualize the sequential path of coordinates using matplotlib
-
-    def draw_plot(self, image_name=None):
-        """Generate and render a sequential vector path of the coordinates using matplotlib."""
-        if not self.SepSentenc:
-            print("Nothing to plot.")
-            return
-
-        x_values = [p[0] for p in self.SepSentenc]
-        y_values = [p[1] for p in self.SepSentenc]
-        plt.figure(figsize=(9, 7))
-        colors = cm.plasma(np.linspace(0, 1, max(len(self.SepSentenc) - 1, 1)))
-
-        for i in range(len(self.SepSentenc) - 1):
-            plt.plot(
-                x_values[i:i + 2],
-                y_values[i:i + 2],
-                color=colors[i],
-                linewidth=2
-            )
-            plt.annotate(
-                "",
-                xy=(x_values[i + 1], y_values[i + 1]),
-                xytext=(x_values[i], y_values[i]),
-                arrowprops=dict(arrowstyle="->", color=colors[i], lw=1.2)
-            )
-
-        plt.scatter(x_values, y_values)
-
-        for i, (x, y) in enumerate(self.SepSentenc):
-            plt.annotate(
-                str(i + 1),
-                (x, y),
-                textcoords="offset points",
-                xytext=(5, 5)
-            )
-# Configure plot layout settings and render the final figure
-        plt.title("Encoded Path")
-        plt.xlabel("X coordinate")
-        plt.ylabel("Y coordinate")
-        plt.grid(True)
-
-        if image_name:
-            plt.savefig(image_name, dpi=150)
-            print(f"Saved image as {image_name}")
-
-        plt.show()
-
-# Presentation Layer: Standalone CLI flow functions decoupled from the core data processing class
-
-
-def run_encode_flow(app):
-    """Execute the complete interactive terminal flow for encoding a user message."""
-# this loop forces valid ASCII input before allowing the sequence to proceed.
-    while True:
-        app.message = input("Enter message: ")
-        if app.is_valid_text(app.message):
-            break
-        print("[!] Invalid characters detected. Please use standard characters.")
-
-    key_text = input("Key: ").strip()
-    try:
-        app.key = int(key_text)
-
-# Fallback to a default key value of 0 if parsing fails
-
-    except ValueError:
-        app.key = 0
-    app.encode_message()
-
-# Prompt user for output location or fall back to default filename
-
-    filename = input("Output file [default.txt]: ").strip()
-    if filename == "":
-        filename = "default.txt"
-
-    app.save_coordinates(filename)
-    print(f"Coordinates saved to {filename}")
-    app.print_table()
-
-    save_image = input("Save graph as PNG? (y/n): ").lower()
-    image_file = None
-    if save_image == "y":
-        image_file = input("Image filename [plot.png]: ").strip()
-        if image_file == "":
-            image_file = "plot.png"
-
-    app.draw_plot(image_file)
-
-
-def run_decode_flow(app):
-    """Execute the complete interactive terminal flow for decoding a coordinate file."""
-# Prompt user for input coordinate file or fall back to default filename
-    filename = input("Coordinate file [default.txt]: ").strip()
-    if filename == "":
-        filename = "default.txt"
-    key_text = input("Key (press Enter for 0): ").strip()
-    try:
-        app.key = int(key_text)
-    except ValueError:
-        app.key = 0
-
-    app.load_coordinates(filename)
-    print("\nDecoded message:")
-    print(app.decode_message())
-
-# Main application runtime loop and command menu execution
-
-
-def main():
-    app = CipherApp()
-    while True:
-        print("\n===== MENU =====")
-        print("1. Encode")
-        print("2. Decode")
-        print("3. Exit")
-
-        choice = input("Select option: ")
-
-        if choice == "1":
-            run_encode_flow(app)
-
-        elif choice == "2":
-            run_decode_flow(app)
-
-        elif choice == "3":
-            print("Goodbye.")
-            break
-
-        else:
-            print("Invalid option.")
-
-
-if __name__ == "__main__":
-    main()

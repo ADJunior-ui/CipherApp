@@ -1,147 +1,143 @@
-import io
-import os
 import base64
-import tempfile
-from flask import Flask, render_template, request, jsonify
+import io
 
-# Force Matplotlib to run silently in the background
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from flask import Flask, jsonify, render_template, request
 
 from decodeApp import CipherApp
 
-web_app = Flask(__name__)
+matplotlib.use('Agg')
+
+app = Flask(__name__)
 cipher_engine = CipherApp()
 
-def generate_graph_base64(coordinates):
-    if not coordinates:
+
+def graph_to_base64(points):
+    if not points:
         return None
-    plt.figure(figsize=(6, 4))
-    plt.gcf().patch.set_facecolor('#09090b')
-    ax = plt.gca()
+
+    fig = plt.figure(figsize=(6, 4))
+    fig.patch.set_facecolor('#09090b')
+    ax = fig.add_subplot(111)
     ax.set_facecolor('#09090b')
 
-    x_val = [point[0] for point in coordinates]
-    y_val = [point[1] for point in coordinates]
+    x_vals = [point[0] for point in points]
+    y_vals = [point[1] for point in points]
 
-    ax.plot(x_val, y_val, color='#818cf8', marker='o', 
-            markerfacecolor='#4f46e5', markeredgecolor='#818cf8', linewidth=2)
-
+    ax.plot(
+        x_vals,
+        y_vals,
+        color='#818cf8',
+        marker='o',
+        markerfacecolor='#4f46e5',
+        markeredgecolor='#818cf8',
+        linewidth=2,
+    )
     ax.tick_params(colors='#71717a', labelsize=9)
     ax.grid(True, color='#27272a', linestyle='--', linewidth=0.5)
 
-    # Compute axis limits from data with small margins instead of fixed limits
-    x_min, x_max = min(x_val), max(x_val)
-    y_min, y_max = min(y_val), max(y_val)
-    x_margin = max(1, (x_max - x_min) * 0.1)
-    y_margin = max(1, (y_max - y_min) * 0.1)
-    ax.set_xlim(x_min - x_margin, x_max + x_margin)
-    ax.set_ylim(y_min - y_margin, y_max + y_margin)
+    if len(points) > 1:
+        x_min = min(x_vals)
+        x_max = max(x_vals)
+        y_min = min(y_vals)
+        y_max = max(y_vals)
+        x_margin = max(1, (x_max - x_min) * 0.1)
+        y_margin = max(1, (y_max - y_min) * 0.1)
+        ax.set_xlim(x_min - x_margin, x_max + x_margin)
+        ax.set_ylim(y_min - y_margin, y_max + y_margin)
 
-    for spine in ax.spines.values():
-        spine.set_visible(False)
+    for side in ax.spines.values():
+        side.set_visible(False)
 
     plt.tight_layout()
     buffer = io.BytesIO()
-    plt.savefig(buffer, format='png', dpi=140, facecolor=plt.gcf().get_facecolor(), edgecolor='none')
+    plt.savefig(buffer, format='png', dpi=140, facecolor=fig.get_facecolor(), edgecolor='none')
     buffer.seek(0)
-    base64_string = base64.b64encode(buffer.read()).decode('utf-8')
-    plt.close()
-    return base64_string
+    encoded = base64.b64encode(buffer.read()).decode('utf-8')
+    plt.close(fig)
+    return encoded
 
 
-def _atomic_write(path, text, encoding='utf-8'):
-    dir_name = os.path.dirname(path) or '.'
-    fd, tmp_path = tempfile.mkstemp(dir=dir_name)
+def safe_int(value):
     try:
-        with os.fdopen(fd, 'w', encoding=encoding) as tmp:
-            tmp.write(text)
-        os.replace(tmp_path, path)
-    finally:
-        if os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except Exception:
-                pass
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
 
-@web_app.route('/')
+
+def parse_points(text):
+    points = []
+    for block in text.split():
+        if ',' not in block:
+            continue
+        x_text, y_text = block.split(',', 1)
+        x = safe_int(x_text)
+        y = safe_int(y_text)
+        if 0 <= x <= 9 and 0 <= y <= 1000:
+            points.append((x, y))
+    return points
+
+
+def save_result(filename, text):
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(text)
+
+
+@app.route('/')
 def home():
     return render_template('index.html')
 
-@web_app.route('/process', methods=['POST'])
-def process_data():
-    data = request.get_json()
-    mode = data.get('mode', 'encode')
-    user_text = data.get('text', '').strip()
-    
-    try:
-        key_value = int(data.get('key', 0))
-    except ValueError:
-        key_value = 0
 
-    # Protect against very large payloads
-    if not user_text:
+@app.route('/process', methods=['POST'])
+def process_data():
+    data = request.get_json(silent=True) or {}
+    mode = data.get('mode', 'encode')
+    text = (data.get('text') or '').strip()
+    key = safe_int(data.get('key'))
+
+    if not text:
         return jsonify({'success': False, 'error': 'Input text field cannot be completely empty.'})
 
-    if len(user_text) > 10000:
-        return jsonify({'success': False, 'error': 'Input too large.'})
+    if len(text) > 10000:
+        return jsonify({'success': False, 'error': 'Input is too large.'})
 
     if mode == 'encode':
-        if not cipher_engine.is_valid_text(user_text):
+        if not cipher_engine.is_valid_text(text):
             return jsonify({'success': False, 'error': 'Invalid characters detected.'})
-        
-        cipher_engine.message = user_text
-        cipher_engine.key = key_value
+
+        cipher_engine.set_message(text)
+        cipher_engine.set_key(key)
         cipher_engine.encode_message()
-        
-        formatted_coordinates = " ".join([f"{x},{y}" for x, y in cipher_engine.SepSentenc])
+        result = cipher_engine.to_coordinate_string()
+        save_result('default.txt', result)
+        return jsonify({
+            'success': True,
+            'result': result,
+            'graph': graph_to_base64(cipher_engine.to_coordinate_list())
+        })
 
-        # Persist encoded coordinates to default.txt atomically
-        try:
-            _atomic_write('default.txt', formatted_coordinates, encoding='utf-8')
-        except Exception:
-            # fall back to best-effort write
-            with open('default.txt', 'w', encoding='utf-8') as f:
-                f.write(formatted_coordinates)
-        graph_data = generate_graph_base64(cipher_engine.SepSentenc)
-        return jsonify({'success': True, 'result': formatted_coordinates, 'graph': graph_data})
+    if mode == 'decode':
+        points = parse_points(text)
+        if not points:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to parse coordinates. Use format: X,Y X,Y'
+            })
 
-    else:
-        parsed_coordinates = []
-        for block in user_text.split():
-            if ',' in block:
-                x_str, y_str = block.split(',', 1)
-                try:
-                    x = int(x_str)
-                    y = int(y_str)
-                except ValueError:
-                    return jsonify({'success': False, 'error': 'Coordinates must be integers.'})
-                # Basic validation for coordinates
-                if not (0 <= x <= 9) or y < 0 or y > 1000:
-                    return jsonify({'success': False, 'error': 'Coordinate values out of expected range.'})
-                parsed_coordinates.append((x, y))
+        cipher_engine.set_coordinates(points)
+        cipher_engine.set_key(key)
+        cipher_engine.decode_message()
+        save_result('default.txt', cipher_engine.message)
+        return jsonify({
+            'success': True,
+            'result': cipher_engine.message,
+            'graph': graph_to_base64(cipher_engine.to_coordinate_list())
+        })
 
-        if not parsed_coordinates:
-            return jsonify({'success': False, 'error': 'Failed to parse coordinates. Use format: X,Y X,Y'})
+    return jsonify({'success': False, 'error': 'Unknown mode.'})
 
-        cipher_engine.SepSentenc = parsed_coordinates
-        cipher_engine.key = key_value
-        try:
-            cipher_engine.decode_message()
-        except Exception:
-            return jsonify({'success': False, 'error': 'Failed to decode coordinates.'})
-
-        # Persist decoded message atomically
-        try:
-            _atomic_write('default.txt', cipher_engine.message, encoding='utf-8')
-        except Exception:
-            with open('default.txt', 'w', encoding='utf-8') as f:
-                f.write(cipher_engine.message)
-
-        graph_data = generate_graph_base64(cipher_engine.SepSentenc)
-        return jsonify({'success': True, 'result': cipher_engine.message, 'graph': graph_data})
 
 if __name__ == '__main__':
-    debug_flag = os.environ.get('FLASK_DEBUG', 'False').lower() in ('1', 'true', 'yes')
-    web_app.run(host='127.0.0.1', debug=debug_flag)
+    app.run(debug=True)
+

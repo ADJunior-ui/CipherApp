@@ -153,8 +153,19 @@
 
         // Event triggers
         submitBtn.addEventListener('click', runPipeline);
-        inputText.addEventListener('input', runPipeline);
-        inputKey.addEventListener('input', runPipeline);
+        // Debounce helper to avoid firing requests on every keystroke
+        function debounce(fn, wait) {
+            let t = null;
+            return function(...args) {
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), wait);
+            };
+        }
+
+        const debouncedRun = debounce(runPipeline, 300);
+
+        inputText.addEventListener('input', debouncedRun);
+        inputKey.addEventListener('input', debouncedRun);
     </script>
 </body>
 

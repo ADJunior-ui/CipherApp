@@ -46,14 +46,21 @@ class CipherApp:
         self.message = ""
         for x, y in self.SepSentenc:
             value = y * 10 + x - self.key
-            self.message += chr(value)
+            # Validate value is a valid Unicode code point
+            if value < 0 or value > 0x10FFFF:
+                self.message += '?'
+            else:
+                try:
+                    self.message += chr(value)
+                except Exception:
+                    self.message += '?'
         return self.message
 
 # Export the generated coordinate pairs into a plain text file
 
     def save_coordinates(self, filename):
         """Export the current session's coordinates into a plain text file."""
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding='utf-8') as file:
             for x, y in self.SepSentenc:
                 file.write(f"{x} {y}\n")
 
@@ -63,13 +70,15 @@ class CipherApp:
         """Import coordinate pairs from an external text file into the application state."""
         self.SepSentenc = []
         try:
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding='utf-8') as file:
                 for line in file:
-                    parts = line.strip().split()
+                    line = line.strip()
+                    if not line:
+                        continue
+                    parts = line.replace(',', ' ').split()
                     if len(parts) == 2:
                         try:
-                            self.SepSentenc.append(
-                                (int(parts[0]), int(parts[1])))
+                            self.SepSentenc.append((int(parts[0]), int(parts[1])))
                         except ValueError:
                             print("[!] Error: Skipping corrupted coordinate row.")
         except FileNotFoundError:
